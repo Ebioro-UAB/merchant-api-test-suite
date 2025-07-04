@@ -86,12 +86,12 @@ class MultiLanguageApiRouter:
             client = EbioroApiClient(api_key, api_secret)
             
             if operation == 'test_auth':
-                status_code, response_data, elapsed_time = client.test_authentication()
+                result = client.test_authentication()
                 return {
-                    'success': status_code == 200,
-                    'status_code': status_code,
-                    'response': response_data,
-                    'elapsed_time': elapsed_time,
+                    'success': result['success'],
+                    'status_code': result['status_code'],
+                    'response': result['response'],
+                    'elapsed_time': result['elapsed_time'],
                     'language': 'python'
                 }
             

@@ -182,13 +182,6 @@ class EbioroApiClient {
     }
 
     /**
-     * Create a refund
-     */
-    async createRefund(paymentId, refundData) {
-        return this.makeRequest('POST', `/payments/${EbioroApiClient.pathParam(paymentId)}/refunds`, refundData);
-    }
-
-    /**
      * Get all refunds
      */
     async getAllRefunds() {

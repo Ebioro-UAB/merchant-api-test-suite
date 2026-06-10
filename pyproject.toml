@@ -1,6 +1,6 @@
 [project]
 name = "ebioro-merchant-api-test-suite"
-version = "1.0.0"
+version = "1.1.0"
 description = "API client libraries and test suite for the Ebioro Merchant API"
 requires-python = ">=3.11"
 dependencies = [

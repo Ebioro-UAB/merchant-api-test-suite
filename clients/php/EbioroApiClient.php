@@ -135,13 +135,6 @@ class EbioroApiClient {
     }
     
     /**
-     * Create a refund
-     */
-    public function createRefund($paymentId, $refundData) {
-        return $this->makeRequest('POST', '/payments/' . $paymentId . '/refunds', $refundData);
-    }
-    
-    /**
      * Get all refunds
      */
     public function getAllRefunds() {

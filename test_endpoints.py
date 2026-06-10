@@ -189,43 +189,6 @@ class TestEndpoints(unittest.TestCase):
         logger.log_test_result("Get All Payments Success", True, f"Retrieved {response_data['total']} payments")
     
     @patch('requests.Session.request')
-    def test_create_refund_success(self, mock_request):
-        """Test successful refund creation"""
-        logger.log_test_start("Create Refund Success")
-        
-        # Mock successful response
-        mock_response = MagicMock()
-        mock_response.status_code = 201
-        mock_response.json.return_value = {
-            "id": "ref_123",
-            "paymentId": "pay_123",
-            "amount": {"currency": "USD", "value": 500},
-            "status": "pending",
-            "createdAt": "2023-01-01T00:00:00Z"
-        }
-        mock_request.return_value = mock_response
-        
-        # Test refund creation
-        payment_id = "pay_123"
-        refund_data = TestDataGenerator.generate_refund_payload()
-        status_code, response_data, elapsed_time = self.client.create_refund(payment_id, refund_data)
-        
-        # Verify request
-        mock_request.assert_called_once()
-        call_args = mock_request.call_args
-        
-        self.assertEqual(call_args[1]['method'], 'POST')
-        self.assertTrue(call_args[1]['url'].endswith(f'/payments/{payment_id}/refunds'))
-        self.assertEqual(call_args[1]['data'], json.dumps(refund_data, separators=(',', ':')))
-        
-        # Verify response
-        self.assertEqual(status_code, 201)
-        self.assertEqual(response_data['id'], 'ref_123')
-        self.assertEqual(response_data['paymentId'], payment_id)
-        
-        logger.log_test_result("Create Refund Success", True, f"Refund created with ID: {response_data['id']}")
-    
-    @patch('requests.Session.request')
     def test_get_account_balances_success(self, mock_request):
         """Test successful account balance retrieval"""
         logger.log_test_start("Get Account Balances Success")

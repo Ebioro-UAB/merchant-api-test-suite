@@ -234,48 +234,6 @@ def get_balances():
             'error': str(e)
         })
 
-@app.route('/api/create-refund', methods=['POST'])
-def create_refund():
-    """Create a refund for a payment"""
-    try:
-        if not api_client:
-            return jsonify({
-                'success': False,
-                'error': 'API client not initialized'
-            })
-        
-        data = request.get_json()
-        payment_id = data.get('payment_id')
-        amount = data.get('amount')
-        
-        if not payment_id:
-            return jsonify({
-                'success': False,
-                'error': 'Payment ID is required'
-            })
-        
-        refund_data = TestDataGenerator.generate_refund_payload(
-            amount if amount else 500, 
-            "Refund from web interface"
-        )
-        
-        status_code, response_data, elapsed_time = api_client.create_refund(payment_id, refund_data)
-        
-        return jsonify({
-            'success': status_code in [200, 201],
-            'status_code': status_code,
-            'elapsed_time': elapsed_time,
-            'response': response_data,
-            'request_data': refund_data
-        })
-    
-    except Exception as e:
-        logger.logger.error(f"Error creating refund: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        })
-
 @app.route('/api/validate-signature')
 def validate_signature():
     """Validate signature implementation"""

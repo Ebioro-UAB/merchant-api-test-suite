@@ -361,7 +361,7 @@ class ComprehensiveTestSuite:
         total_elapsed = time.time() - self.start_time
         
         overall_results = {
-            "test_suite_version": "1.0.0",
+            "test_suite_version": "1.1.0",
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "total_elapsed_time": total_elapsed,
             "api_endpoint": self.base_url,

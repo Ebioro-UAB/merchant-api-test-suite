@@ -66,7 +66,7 @@ This is a comprehensive multi-language testing suite for the Ebioro Merchant API
 ### Test Execution Flow
 1. Initialize API client with credentials
 2. Run authentication tests
-3. Execute endpoint tests (payments, refunds, balances)
+3. Execute endpoint tests (payments, payment links, invoices, refund listing, balances)
 4. Validate responses and measure performance
 5. Generate comprehensive test report
 

@@ -68,7 +68,7 @@ The auth-reference clients demonstrate the request-signing scheme — the genuin
 
 All implementations:
 - ✅ Use identical HMAC-SHA256 authentication
-- ✅ Support all API operations (payments, refunds, balances)
+- ✅ Use identical HMAC-SHA256 authentication and core payment operations (full API surface — invoices, payment links, refund listing — in the maintained Python and Node.js clients)
 - ✅ Include proper error handling and logging
 - ✅ Follow language-specific best practices
 

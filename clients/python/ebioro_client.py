@@ -78,6 +78,8 @@ class EbioroApiClient:
         # Sign the parsed path + query, mirroring the Node client: the signed
         # string must match the path actually transmitted on the wire, not the
         # raw input (which URL parsing could normalize differently).
+        # Assumes base_url is scheme://host with no path prefix (as documented);
+        # a path-bearing base_url would end up inside the signed string.
         parsed = urlparse(url)
         signed_path = parsed.path + (f"?{parsed.query}" if parsed.query else "")
         headers = self.generate_headers(method, signed_path, body)

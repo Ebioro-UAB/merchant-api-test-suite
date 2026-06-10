@@ -59,9 +59,9 @@ async function testNodejsClientWithDebug() {
 import os
 from clients.python.ebioro_client import EbioroApiClient
 client = EbioroApiClient(os.environ["EBIORO_API_KEY"], os.environ["EBIORO_API_SECRET"])
-status_code, response, elapsed = client.test_authentication()
-print(f"Python Status: {status_code}")
-print(f"Python Response: {response}")
+result = client.test_authentication()
+print(f"Python Status: {result['status_code']}")
+print(f"Python Response: {result['response']}")
             `], { env: process.env });
             
             pythonTest.stdout.on('data', (data) => {

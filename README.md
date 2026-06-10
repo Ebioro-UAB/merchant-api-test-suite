@@ -167,8 +167,8 @@ python test_endpoints.py
 2. Install dependencies: `pip install flask requests`
 3. Set environment variables (optional):
    ```bash
-   export API_KEY="your_public_key"
-   export API_SECRET_KEY="your_secret_key"
+   export EBIORO_API_KEY="your_public_key"
+   export EBIORO_API_SECRET="your_secret_key"
    ```
 4. Run the application: `python main.py --web --port 5000`
 

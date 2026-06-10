@@ -3,10 +3,11 @@
 
 from clients.python.ebioro_client import EbioroApiClient
 import json
+import os
 
 # Use test credentials
-api_key = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg="
-api_secret = "sk_testR3tSbF78YLHwNod9T3fBV0+cFkS0t2mJSbv71EwJjPg="
+api_key = os.environ["EBIORO_API_KEY"]
+api_secret = os.environ["EBIORO_API_SECRET"]
 
 print("=== Python Client Headers Debug ===")
 

@@ -2,8 +2,8 @@
 require_once 'EbioroApiClient.php';
 
 // Test credentials
-$apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-$apiSecret = "sk_testEaFcSJwPgRKyYmLkAJwHdLuRXNYFzIcGUjr4u7ZMgVjNmEWs";
+$apiKey = getenv('EBIORO_API_KEY');
+$apiSecret = getenv('EBIORO_API_SECRET');
 
 echo "Testing PHP Ebioro API Client\n";
 echo "=====================================\n";

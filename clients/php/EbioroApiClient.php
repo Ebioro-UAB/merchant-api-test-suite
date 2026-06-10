@@ -124,35 +124,35 @@ class EbioroApiClient {
      * Get a specific payment
      */
     public function getPayment($paymentId) {
-        return $this->makeRequest('GET', '/api/v1/payments/' . $paymentId);
+        return $this->makeRequest('GET', '/payments/' . $paymentId);
     }
     
     /**
      * Get all payments
      */
     public function getAllPayments() {
-        return $this->makeRequest('GET', '/api/v1/payments');
+        return $this->makeRequest('GET', '/payments');
     }
     
     /**
      * Create a refund
      */
     public function createRefund($paymentId, $refundData) {
-        return $this->makeRequest('POST', '/api/v1/payments/' . $paymentId . '/refunds', $refundData);
+        return $this->makeRequest('POST', '/payments/' . $paymentId . '/refunds', $refundData);
     }
     
     /**
      * Get all refunds
      */
     public function getAllRefunds() {
-        return $this->makeRequest('GET', '/api/v1/refunds');
+        return $this->makeRequest('GET', '/refunds');
     }
     
     /**
      * Get account balances
      */
     public function getAccountBalances() {
-        return $this->makeRequest('GET', '/api/v1/account/balances');
+        return $this->makeRequest('GET', '/accounts/balances');
     }
     
     /**

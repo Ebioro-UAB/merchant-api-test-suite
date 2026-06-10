@@ -79,3 +79,8 @@ debug_signature.py
 test_working_format.py
 test_minimal_payment.py
 corrected_documentation_code.py
+# Compiled artifacts
+*.class
+clients/csharp/**/obj/
+clients/csharp/**/bin/
+.venv/

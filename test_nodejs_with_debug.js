@@ -25,8 +25,8 @@ class DebugEbioroApiClient extends EbioroApiClient {
 
 async function testNodejsClientWithDebug() {
     // Use test credentials
-    const apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-    const apiSecret = "sk_testR3tSbF78YLHwNod9T3fBV0+cFkS0t2mJSbv71EwJjPg=";
+    const apiKey = process.env.EBIORO_API_KEY;
+    const apiSecret = process.env.EBIORO_API_SECRET;
     
     console.log("Testing Node.js Ebioro API Client with Debug");
     console.log("============================================");

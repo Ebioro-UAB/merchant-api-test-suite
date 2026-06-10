@@ -235,8 +235,8 @@ public class EbioroApiClient {
         try {
             // Initialize client
             EbioroApiClient client = new EbioroApiClient(
-                System.getenv("API_KEY"),
-                System.getenv("API_SECRET_KEY")
+                System.getenv("EBIORO_API_KEY"),
+                System.getenv("EBIORO_API_SECRET")
             );
             
             // Test authentication

@@ -23,7 +23,7 @@ class Config:
         
         # Web Interface Configuration
         self.WEB_PORT = int(os.getenv("WEB_PORT", "5000"))
-        self.WEB_HOST = os.getenv("WEB_HOST", "0.0.0.0")
+        self.WEB_HOST = os.getenv("WEB_HOST", "127.0.0.1")  # localhost only — the web UI holds API credentials in session
         
         # Validation
         self.validate_config()

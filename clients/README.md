@@ -5,39 +5,40 @@ This directory contains API client implementations for the Ebioro Merchant API i
 ## Available Languages
 
 ### Python (`python/`)
-- **File**: `ebioro_client.py` (in root directory)
+- **File**: `python/ebioro_client.py`
 - **Description**: Python implementation using the requests library
-- **Features**: Comprehensive error handling, detailed logging, type hints
+- **Features**: Full API surface (payments, payment links, invoices, refunds, balances, webhook verification)
 - **Dependencies**: `requests`
-- **Status**: ✅ Fully functional and tested
+- **Status**: ✅ Maintained — tested live against the Ebioro test environment (2026-06-10)
 
 ### Java (`java/`)
 - **File**: `EbioroApiClient.java`
 - **Description**: Java implementation using HttpClient (Java 11+)
 - **Features**: Modern Java patterns, proper exception handling, builder pattern
-- **Dependencies**: Jackson for JSON processing
-- **Status**: 🔶 Code complete, requires Java runtime for testing
+- **Dependencies**: None (JDK built-ins)
+- **Status**: 📘 Auth reference — demonstrates HMAC signing + core payment ops; not extended with new API features
 
 ### PHP (`php/`)
 - **File**: `EbioroApiClient.php`
 - **Description**: PHP implementation using cURL
 - **Features**: Object-oriented design, error handling, PSR compliance
 - **Dependencies**: cURL extension
-- **Status**: 🔶 Code complete, requires PHP runtime for testing
+- **Status**: 📘 Auth reference — demonstrates HMAC signing + core payment ops; not extended with new API features
 
 ### Node.js (`nodejs/`)
 - **File**: `ebioro-client.js`
 - **Description**: Node.js implementation using native https module
 - **Features**: Promise-based async/await, ES6 classes, no external dependencies
 - **Dependencies**: None (uses Node.js built-ins)
-- **Status**: 🔶 Code complete, requires Node.js runtime for testing
+- **Features**: Full API surface (payments, payment links, invoices, refunds, balances, webhook verification)
+- **Status**: ✅ Maintained — tested live against the Ebioro test environment (2026-06-10)
 
 ### C# (`csharp/`)
 - **File**: `EbioroApiClient.cs`
 - **Description**: C# implementation using HttpClient
 - **Features**: Async/await patterns, LINQ, proper disposal patterns
 - **Dependencies**: System.Text.Json
-- **Status**: 🔶 Code complete, requires .NET runtime for testing
+- **Status**: 📘 Auth reference — demonstrates HMAC signing + core payment ops; not extended with new API features
 
 ## Common Features
 

@@ -1,7 +1,11 @@
 import logging
+import os
 import sys
 from datetime import datetime
 from typing import Optional
+
+# Header values that must never reach a log file.
+SENSITIVE_HEADERS = ("X-Digest-Key", "X-Digest-Signature")
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with colors for different log levels"""
@@ -56,9 +60,15 @@ class ApiLogger:
         self.logger.addHandler(file_handler)
     
     def log_request(self, method: str, url: str, headers: dict, body: Optional[str] = None):
-        """Log API request details"""
+        """Log API request details. Credential headers are redacted defensively
+        even if the caller already redacted them — log files must never contain
+        the API key or a signature."""
+        safe_headers = {
+            k: ("[REDACTED]" if k in SENSITIVE_HEADERS and v != "[REDACTED]" else v)
+            for k, v in (headers or {}).items()
+        }
         self.logger.info(f"🔄 {method} {url}")
-        self.logger.debug(f"Headers: {headers}")
+        self.logger.debug(f"Headers: {safe_headers}")
         if body:
             self.logger.debug(f"Body: {body}")
     
@@ -72,7 +82,13 @@ class ApiLogger:
         self.logger.debug(f"Response body: {response_body}")
     
     def log_signature_debug(self, payload_string: str, signature: str, timestamp: str):
-        """Log signature generation details for debugging"""
+        """Log signature generation details for debugging.
+
+        Disabled unless EBIORO_SIGNATURE_DEBUG=true: the payload can contain
+        request bodies and the signature is credential-derived material that
+        does not belong in a persistent log file."""
+        if os.getenv("EBIORO_SIGNATURE_DEBUG", "").lower() != "true":
+            return
         self.logger.debug(f"Signature payload: {payload_string}")
         self.logger.debug(f"Generated signature: {signature}")
         self.logger.debug(f"Timestamp: {timestamp}")

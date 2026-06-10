@@ -140,21 +140,6 @@ class TestDataGenerator:
             }
         }
     
-    @staticmethod
-    def generate_refund_payload(amount: int = 500, description: str = "Test refund") -> Dict[str, Any]:
-        """Generate a valid refund payload"""
-        return {
-            "amount": {
-                "currency": "USD",
-                "value": amount
-            },
-            "description": description,
-            "metadata": {
-                "refundReason": "customer_request",
-                "testMode": True
-            }
-        }
-
 def format_json_response(data: Any, indent: int = 2) -> str:
     """Format JSON response for display"""
     try:

@@ -149,7 +149,9 @@ This client correctly implements HMAC-SHA256 authentication as required by the E
 - `get_asset_balance(asset)` - Get specific asset balance
 
 ### Refunds
-- `create_refund(payment_id, refund_data)` - Create a refund
+
+> Refunds are issued from the Ebioro enterprise portal, not via the API: a refund moves the merchant's own funds and must be signed with the merchant's signing session, which an API key cannot do. The API provides read access only.
+
 - `get_refunds()` - List all refunds
 - `get_refund(refund_id)` - Get specific refund details
 

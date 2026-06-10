@@ -50,9 +50,11 @@ class ApiLogger:
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)
         
-        # File handler for detailed logs
+        # File handler. INFO and above only: DEBUG output (request bodies,
+        # signature debug) stays on the console and never lands in a
+        # persistent file.
         file_handler = logging.FileHandler('ebioro_api_tests.log')
-        file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(logging.INFO)
         file_formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
         )

@@ -40,7 +40,6 @@ class EbioroTestSuite {
         this.addEventListenerSafe('list-payments', 'click', this.listPayments.bind(this));
         this.addEventListenerSafe('get-balances', 'click', this.getBalances.bind(this));
         this.addEventListenerSafe('get-refunds', 'click', this.getRefunds.bind(this));
-        this.addEventListenerSafe('create-refund', 'click', this.createRefund.bind(this));
         
         // Signature validation
         this.addEventListenerSafe('validate-signature', 'click', this.validateSignature.bind(this));
@@ -663,53 +662,6 @@ class EbioroTestSuite {
             } else {
                 this.showConnectionStatus('danger', 
                     `Refund retrieval failed (Status: ${data.status_code})`);
-            }
-        } catch (error) {
-            this.showConnectionStatus('danger', `Network error: ${error.message}`);
-        } finally {
-            this.hideLoading();
-        }
-    }
-    
-    async createRefund() {
-        if (!this.isCredentialsValid) {
-            alert('Please test and validate your credentials first.');
-            return;
-        }
-        
-        const paymentId = document.getElementById('refund-payment-id').value.trim();
-        const amount = document.getElementById('refund-amount').value.trim();
-        
-        if (!paymentId) {
-            alert('Please enter a Payment ID to refund.');
-            return;
-        }
-        
-        this.showLoading('Creating refund...');
-        
-        try {
-            const requestBody = { payment_id: paymentId };
-            if (amount) {
-                requestBody.amount = parseInt(amount);
-            }
-            
-            const response = await fetch('/api/create-refund', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            const data = await response.json();
-            this.displayApiResponse(data);
-            
-            if (data.success) {
-                this.showConnectionStatus('success', 
-                    `Refund created successfully! Refund ID: ${data.response?.id || 'N/A'}`);
-            } else {
-                this.showConnectionStatus('danger', 
-                    `Refund creation failed (Status: ${data.status_code})`);
             }
         } catch (error) {
             this.showConnectionStatus('danger', `Network error: ${error.message}`);

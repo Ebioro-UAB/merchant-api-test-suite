@@ -164,14 +164,6 @@ namespace Ebioro.Api
         }
 
         /// <summary>
-        /// Create a refund
-        /// </summary>
-        public async Task<ApiResponse> CreateRefundAsync(string paymentId, object refundData)
-        {
-            return await MakeRequestAsync("POST", $"/payments/{paymentId}/refunds", refundData);
-        }
-
-        /// <summary>
         /// Get all refunds
         /// </summary>
         public async Task<ApiResponse> GetAllRefundsAsync()

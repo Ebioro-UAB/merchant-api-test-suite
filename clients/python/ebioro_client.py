@@ -4,7 +4,7 @@ import hmac
 import hashlib
 import requests
 from typing import Dict, Any, Optional, Tuple
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlparse
 from logger_config import logger
 from utils import ValidationError, SignatureValidator, ResponseValidator, format_json_response, calculate_elapsed_time
 
@@ -75,7 +75,12 @@ class EbioroApiClient:
             Tuple of (status_code, response_data, elapsed_time)
         """
         url = f"{self.base_url}{path}"
-        headers = self.generate_headers(method, path, body)
+        # Sign the parsed path + query, mirroring the Node client: the signed
+        # string must match the path actually transmitted on the wire, not the
+        # raw input (which URL parsing could normalize differently).
+        parsed = urlparse(url)
+        signed_path = parsed.path + (f"?{parsed.query}" if parsed.query else "")
+        headers = self.generate_headers(method, signed_path, body)
 
         # Store request details. Auth headers are NOT stored: the snapshot is
         # surfaced by debugging endpoints (web UI /api/get-last-request) and
@@ -173,6 +178,9 @@ class EbioroApiClient:
         A payment link is a payment with a longer expiry window. Omit redirectUrl
         for the Ebioro-hosted confirmation screen. The response contains shortUrl —
         the link to share with the payer.
+
+        If payment_data already contains expiresInHours, that value takes
+        precedence over the expires_in_hours parameter (same as the Node client).
         """
         logger.logger.info("🔗 Creating payment link")
         data = dict(payment_data)
@@ -188,11 +196,6 @@ class EbioroApiClient:
         """Retrieve all payments"""
         logger.logger.info("📋 Retrieving all payments")
         return self._make_request("GET", "/payments")
-
-    def create_refund(self, payment_id: str, refund_data: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
-        """Create a refund for a payment"""
-        logger.logger.info(f"💸 Creating refund for payment {payment_id}")
-        return self._make_request("POST", f"/payments/{self._path_param(payment_id)}/refunds", refund_data)
 
     def get_refunds(self) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve all refunds"""

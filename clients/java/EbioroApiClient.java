@@ -187,16 +187,6 @@ public class EbioroApiClient {
         return makeRequest("GET", "/payments", null);
     }
     
-    /**
-     * Create a refund
-     */
-    public ApiResponse createRefund(String paymentId, Map<String, Object> refundData) throws IOException, InterruptedException {
-        return makeRequest("POST", "/payments/" + paymentId + "/refunds", refundData);
-    }
-    
-    /**
-     * Get account balances
-     */
     public ApiResponse getAccountBalances() throws IOException, InterruptedException {
         return makeRequest("GET", "/accounts/balances", null);
     }

@@ -1,7 +1,7 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "ebioro-merchant-api-test-suite"
+version = "1.0.0"
+description = "API client libraries and test suite for the Ebioro Merchant API"
 requires-python = ">=3.11"
 dependencies = [
     "flask>=3.1.1",

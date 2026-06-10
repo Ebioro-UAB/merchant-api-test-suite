@@ -8,8 +8,8 @@ class TestCSharpClient
         try
         {
             // Test credentials
-            string apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-            string apiSecret = "sk_testEaFcSJwPgRKyYmLkAJwHdLuRXNYFzIcGUjr4u7ZMgVjNmEWs";
+            string apiKey = Environment.GetEnvironmentVariable("EBIORO_API_KEY");
+            string apiSecret = Environment.GetEnvironmentVariable("EBIORO_API_SECRET");
             
             Console.WriteLine("Testing C# Ebioro API Client");
             Console.WriteLine("=====================================");

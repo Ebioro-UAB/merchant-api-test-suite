@@ -43,7 +43,7 @@ class TestEndpoints(unittest.TestCase):
         
         self.assertEqual(call_args[1]['method'], 'POST')
         self.assertTrue(call_args[1]['url'].endswith('/payments'))
-        self.assertEqual(call_args[1]['json'], payment_data)
+        self.assertEqual(call_args[1]['data'], json.dumps(payment_data, separators=(',', ':')))
         
         # Verify response
         self.assertEqual(status_code, 201)
@@ -216,7 +216,7 @@ class TestEndpoints(unittest.TestCase):
         
         self.assertEqual(call_args[1]['method'], 'POST')
         self.assertTrue(call_args[1]['url'].endswith(f'/payments/{payment_id}/refunds'))
-        self.assertEqual(call_args[1]['json'], refund_data)
+        self.assertEqual(call_args[1]['data'], json.dumps(refund_data, separators=(',', ':')))
         
         # Verify response
         self.assertEqual(status_code, 201)

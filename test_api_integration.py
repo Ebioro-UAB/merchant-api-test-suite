@@ -4,6 +4,7 @@ Simple test script to validate Ebioro API integration
 Tests the provided Python code against the actual API
 """
 
+import os
 import time
 import json
 import hmac
@@ -11,8 +12,8 @@ import hashlib
 import requests
 
 # API Credentials (Test)
-API_KEY = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg="
-API_SECRET_KEY = "sk_testR3tSbF78YLHwNod9T3fBV0+cFkS0t2mJSbv71EwJjPg="
+API_KEY = os.environ["EBIORO_API_KEY"]
+API_SECRET_KEY = os.environ["EBIORO_API_SECRET"]
 
 # API Endpoint
 BASE_URL = "https://test-merchant.ebioro.com"

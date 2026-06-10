@@ -73,23 +73,23 @@ class TestAuthentication(unittest.TestCase):
         
         # Test valid components
         result = SignatureValidator.validate_signature_components(
-            "/payments", "1234567890", "POST", '{"test": "data"}'
+            "/payments", str(int(time.time())), "POST", '{"test": "data"}'
         )
         self.assertTrue(result["valid"])
         
         # Test invalid path
         result = SignatureValidator.validate_signature_components(
-            "payments", "1234567890", "POST", '{"test": "data"}'
+            "payments", str(int(time.time())), "POST", '{"test": "data"}'
         )
         self.assertFalse(result["valid"])
         self.assertIn("Path must start with '/'", result["errors"])
         
         # Test invalid method
         result = SignatureValidator.validate_signature_components(
-            "/payments", "1234567890", "INVALID", '{"test": "data"}'
+            "/payments", str(int(time.time())), "INVALID", '{"test": "data"}'
         )
         self.assertFalse(result["valid"])
-        self.assertIn("Invalid HTTP method", result["errors"])
+        self.assertIn("Invalid HTTP method: INVALID", result["errors"])
         
         logger.log_test_result("Signature Component Validation", True, "Validation works correctly")
     
@@ -129,13 +129,13 @@ class TestAuthentication(unittest.TestCase):
         
         # Test valid JSON
         result = SignatureValidator.validate_signature_components(
-            "/payments", "1234567890", "POST", '{"valid": "json"}'
+            "/payments", str(int(time.time())), "POST", '{"valid": "json"}'
         )
         self.assertTrue(result["valid"])
         
         # Test invalid JSON
         result = SignatureValidator.validate_signature_components(
-            "/payments", "1234567890", "POST", '{"invalid": json}'
+            "/payments", str(int(time.time())), "POST", '{"invalid": json}'
         )
         self.assertFalse(result["valid"])
         self.assertIn("Invalid JSON", result["errors"][0])

@@ -144,7 +144,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> CreatePaymentAsync(object paymentData)
         {
-            return await MakeRequestAsync("POST", "/api/v1/payments", paymentData);
+            return await MakeRequestAsync("POST", "/payments", paymentData);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> GetPaymentAsync(string paymentId)
         {
-            return await MakeRequestAsync("GET", $"/api/v1/payments/{paymentId}");
+            return await MakeRequestAsync("GET", $"/payments/{paymentId}");
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> GetAllPaymentsAsync()
         {
-            return await MakeRequestAsync("GET", "/api/v1/payments");
+            return await MakeRequestAsync("GET", "/payments");
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> CreateRefundAsync(string paymentId, object refundData)
         {
-            return await MakeRequestAsync("POST", $"/api/v1/payments/{paymentId}/refunds", refundData);
+            return await MakeRequestAsync("POST", $"/payments/{paymentId}/refunds", refundData);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> GetAllRefundsAsync()
         {
-            return await MakeRequestAsync("GET", "/api/v1/refunds");
+            return await MakeRequestAsync("GET", "/refunds");
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> GetAccountBalancesAsync()
         {
-            return await MakeRequestAsync("GET", "/api/v1/account/balances");
+            return await MakeRequestAsync("GET", "/accounts/balances");
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace Ebioro.Api
         /// </summary>
         public async Task<ApiResponse> TestAuthenticationAsync()
         {
-            return await MakeRequestAsync("GET", "/api/v1/payments");
+            return await MakeRequestAsync("GET", "/payments");
         }
 
         /// <summary>

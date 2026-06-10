@@ -15,7 +15,7 @@ A comprehensive **multi-language** testing suite for the Ebioro Merchant API wit
 
 ### Programmatic Usage
 ```python
-from ebioro_client import EbioroApiClient
+from clients.python.ebioro_client import EbioroApiClient
 
 # Initialize client
 client = EbioroApiClient(
@@ -49,7 +49,7 @@ This test suite includes complete API client implementations in multiple program
 
 | Language | File | Status | Description |
 |----------|------|--------|-------------|
-| **Python** | `ebioro_client.py` | ✅ Active | Primary implementation with full test suite |
+| **Python** |  `clients/python/ebioro_client.py` | ✅ Active | Primary implementation with full test suite |
 | **Java** | `clients/java/EbioroApiClient.java` | 🔶 Ready | HttpClient-based implementation |
 | **PHP** | `clients/php/EbioroApiClient.php` | 🔶 Ready | cURL-based implementation |
 | **Node.js** | `clients/nodejs/ebioro-client.js` | 🔶 Ready | Native HTTPS implementation |
@@ -167,8 +167,8 @@ python test_endpoints.py
 2. Install dependencies: `pip install flask requests`
 3. Set environment variables (optional):
    ```bash
-   export API_KEY="your_public_key"
-   export API_SECRET_KEY="your_secret_key"
+   export EBIORO_API_KEY="your_public_key"
+   export EBIORO_API_SECRET="your_secret_key"
    ```
 4. Run the application: `python main.py --web --port 5000`
 
@@ -192,7 +192,7 @@ The client supports various configuration options:
 ## 🎯 Production Considerations
 
 - Replace test credentials with production keys
-- Use production base URL: `https://merchant.ebioro.com`
+- Use production base URL: `https://merchant-api.ebioro.com`
 - Implement proper error handling in your application
 - Set up webhook endpoints to receive payment notifications
 - Add proper logging and monitoring

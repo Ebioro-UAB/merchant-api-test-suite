@@ -16,17 +16,17 @@ class DebugEbioroApiClient extends EbioroApiClient {
         
         return {
             'Content-Type': 'application/json',
-            'X-API-Key': this.apiKey,
-            'X-Timestamp': timestamp,
-            'X-Signature': signature
+            'X-Digest-Key': this.apiKey,
+            'X-Digest-Timestamp': timestamp,
+            'X-Digest-Signature': signature
         };
     }
 }
 
 async function testNodejsClientWithDebug() {
     // Use test credentials
-    const apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-    const apiSecret = "sk_testR3tSbF78YLHwNod9T3fBV0+cFkS0t2mJSbv71EwJjPg=";
+    const apiKey = process.env.EBIORO_API_KEY;
+    const apiSecret = process.env.EBIORO_API_SECRET;
     
     console.log("Testing Node.js Ebioro API Client with Debug");
     console.log("============================================");
@@ -53,14 +53,16 @@ async function testNodejsClientWithDebug() {
             console.log("\n🐍 Comparing with Python client...");
             const { spawn } = require('child_process');
             
+            // Credentials travel via env vars, not string interpolation — special
+            // characters in the secret would otherwise break the generated script.
             const pythonTest = spawn('python3', ['-c', `
-from ebioro_client import EbioroApiClient
-client = EbioroApiClient("${apiKey}", "${apiSecret}")
+import os
+from clients.python.ebioro_client import EbioroApiClient
+client = EbioroApiClient(os.environ["EBIORO_API_KEY"], os.environ["EBIORO_API_SECRET"])
 result = client.test_authentication()
-print(f"Python Status: {result.get('status_code', 'unknown')}")
-print(f"Python Success: {result.get('success', False)}")
-print(f"Python Response: {result.get('response', {})}")
-            `]);
+print(f"Python Status: {result['status_code']}")
+print(f"Python Response: {result['response']}")
+            `], { env: process.env });
             
             pythonTest.stdout.on('data', (data) => {
                 console.log(`Python output: ${data}`);

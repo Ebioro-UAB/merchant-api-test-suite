@@ -5,8 +5,8 @@ public class TestJavaClient {
     public static void main(String[] args) {
         try {
             // Test credentials
-            String apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-            String apiSecret = "sk_testEaFcSJwPgRKyYmLkAJwHdLuRXNYFzIcGUjr4u7ZMgVjNmEWs";
+            String apiKey = System.getenv("EBIORO_API_KEY");
+            String apiSecret = System.getenv("EBIORO_API_SECRET");
             
             System.out.println("Testing Java Ebioro API Client");
             System.out.println("=====================================");

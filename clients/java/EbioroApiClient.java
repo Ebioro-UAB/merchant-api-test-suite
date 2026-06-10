@@ -177,28 +177,28 @@ public class EbioroApiClient {
      * Get a specific payment
      */
     public ApiResponse getPayment(String paymentId) throws IOException, InterruptedException {
-        return makeRequest("GET", "/api/v1/payments/" + paymentId, null);
+        return makeRequest("GET", "/payments/" + paymentId, null);
     }
     
     /**
      * Get all payments
      */
     public ApiResponse getAllPayments() throws IOException, InterruptedException {
-        return makeRequest("GET", "/api/v1/payments", null);
+        return makeRequest("GET", "/payments", null);
     }
     
     /**
      * Create a refund
      */
     public ApiResponse createRefund(String paymentId, Map<String, Object> refundData) throws IOException, InterruptedException {
-        return makeRequest("POST", "/api/v1/payments/" + paymentId + "/refunds", refundData);
+        return makeRequest("POST", "/payments/" + paymentId + "/refunds", refundData);
     }
     
     /**
      * Get account balances
      */
     public ApiResponse getAccountBalances() throws IOException, InterruptedException {
-        return makeRequest("GET", "/api/v1/account/balances", null);
+        return makeRequest("GET", "/accounts/balances", null);
     }
     
     /**
@@ -235,8 +235,8 @@ public class EbioroApiClient {
         try {
             // Initialize client
             EbioroApiClient client = new EbioroApiClient(
-                System.getenv("API_KEY"),
-                System.getenv("API_SECRET_KEY")
+                System.getenv("EBIORO_API_KEY"),
+                System.getenv("EBIORO_API_SECRET")
             );
             
             // Test authentication

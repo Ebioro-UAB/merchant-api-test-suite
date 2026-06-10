@@ -244,8 +244,8 @@ if (require.main === module) {
         try {
             // Initialize client
             const client = new EbioroApiClient(
-                process.env.API_KEY,
-                process.env.API_SECRET_KEY
+                process.env.EBIORO_API_KEY,
+                process.env.EBIORO_API_SECRET
             );
             
             // Test authentication

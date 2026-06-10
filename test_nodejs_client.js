@@ -3,8 +3,8 @@ const { EbioroApiClient } = require('./clients/nodejs/ebioro-client.js');
 
 async function testNodejsClient() {
     // Use test credentials (these are public test keys)
-    const apiKey = "pk_testrSWmOfY4FJo3fDEDQb3xf0L/djbB2vFwMzam/x4OMGg=";
-    const apiSecret = "sk_testR3tSbF78YLHwNod9T3fBV0+cFkS0t2mJSbv71EwJjPg=";
+    const apiKey = process.env.EBIORO_API_KEY;
+    const apiSecret = process.env.EBIORO_API_SECRET;
     
     console.log("Testing Node.js Ebioro API Client");
     console.log("=====================================");

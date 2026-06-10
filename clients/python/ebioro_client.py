@@ -76,18 +76,20 @@ class EbioroApiClient:
         """
         url = f"{self.base_url}{path}"
         headers = self.generate_headers(method, path, body)
-        
-        # Store request details
+
+        # Store request details. Auth headers are NOT stored: the snapshot is
+        # surfaced by debugging endpoints (web UI /api/get-last-request) and
+        # must never reflect the API key or a valid signature back to a caller.
         self.last_request_details = {
             "method": method,
             "url": url,
-            "headers": headers,
+            "headers": self._redact_auth_headers(headers),
             "body": body,
             "timestamp": time.time()
         }
-        
-        # Log request
-        logger.log_request(method, url, headers, json.dumps(body) if body else None)
+
+        # Log request (auth headers redacted for the same reason)
+        logger.log_request(method, url, self._redact_auth_headers(headers), json.dumps(body) if body else None)
         
         start_time = time.time()
         
@@ -149,6 +151,15 @@ class EbioroApiClient:
     def _path_param(value: str) -> str:
         """URL-encode a path parameter so untrusted ids cannot alter the request path."""
         return quote(str(value), safe='')
+
+    @staticmethod
+    def _redact_auth_headers(headers: Dict[str, str]) -> Dict[str, str]:
+        """Return a copy of the headers with credential material removed."""
+        redacted = dict(headers)
+        for sensitive in ("X-Digest-Key", "X-Digest-Signature"):
+            if sensitive in redacted:
+                redacted[sensitive] = "[REDACTED]"
+        return redacted
 
     def create_payment(self, payment_data: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
         """Create a new payment"""
@@ -260,6 +271,10 @@ class EbioroApiClient:
             return False
         if isinstance(raw_body, str):
             raw_body = raw_body.encode("utf-8")
+        if not isinstance(raw_body, bytes):
+            raise TypeError("raw_body must be the raw request body (bytes or str), not a parsed object")
+        if isinstance(signature, bytes):
+            signature = signature.decode("utf-8")
         expected = hmac.new(api_secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected, signature)
     
@@ -313,12 +328,13 @@ class EbioroApiClient:
                     test_case["body"]
                 )
                 
+                # Only confirm that signing succeeded. Never return the headers,
+                # the API key, or the signature itself — this result is surfaced
+                # verbatim by the web UI's /api/validate-signature endpoint.
                 result = {
                     "description": test_case["description"],
                     "success": True,
-                    "headers": headers,
-                    "timestamp": headers["X-Digest-Timestamp"],
-                    "signature": headers["X-Digest-Signature"]
+                    "timestamp": headers["X-Digest-Timestamp"]
                 }
                 
                 logger.logger.info("✅ Signature generated successfully")

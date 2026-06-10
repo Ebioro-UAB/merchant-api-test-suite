@@ -54,22 +54,29 @@ class EbioroApiClient {
      */
     async makeRequest(method, path, requestBody = null) {
         const bodyJson = requestBody ? JSON.stringify(requestBody, null, 0) : '';
-        const headers = this.generateHeaders(method, path, bodyJson);
+        // Parse the URL FIRST and sign the normalized path. WHATWG URL parsing
+        // normalizes percent-encoding and dot segments, so signing the raw input
+        // could produce a signature over a different string than the one
+        // actually transmitted on the wire.
         const url = new URL(this.baseUrl + path);
-        
-        // Store request details
+        const signedPath = url.pathname + url.search;
+        const headers = this.generateHeaders(method, signedPath, bodyJson);
+
+        // Store request details. Auth headers are NOT stored: this snapshot is
+        // surfaced by debugging endpoints (web UI /api/get-last-request) and
+        // must never reflect the API key or a valid signature back to a caller.
         this.lastRequest = {
             method,
             url: url.href,
-            headers,
+            headers: EbioroApiClient.redactAuthHeaders(headers),
             body: bodyJson,
             timestamp: new Date().toISOString()
         };
-        
+
         const options = {
             hostname: url.hostname,
             port: url.port || (url.protocol === 'https:' ? 443 : 80),
-            path: url.pathname + url.search,
+            path: signedPath,
             method: method.toUpperCase(),
             headers: headers,
             timeout: 30000
@@ -127,6 +134,19 @@ class EbioroApiClient {
     }
 
     /**
+     * Return a copy of the headers with credential material removed.
+     */
+    static redactAuthHeaders(headers) {
+        const redacted = { ...headers };
+        for (const sensitive of ['X-Digest-Key', 'X-Digest-Signature']) {
+            if (sensitive in redacted) {
+                redacted[sensitive] = '[REDACTED]';
+            }
+        }
+        return redacted;
+    }
+
+    /**
      * Create a payment
      */
     async createPayment(paymentData) {
@@ -139,6 +159,9 @@ class EbioroApiClient {
      * A payment link is a payment with a longer expiry window. Omit redirectUrl
      * for the Ebioro-hosted confirmation screen. The response contains shortUrl —
      * the link to share with the payer.
+     *
+     * If paymentData already contains expiresInHours, that value takes
+     * precedence over the expiresInHours parameter.
      */
     async createPaymentLink(paymentData, expiresInHours = 168) {
         return this.makeRequest('POST', '/payments', { expiresInHours, ...paymentData });
@@ -233,6 +256,9 @@ class EbioroApiClient {
      * can change the bytes and break verification. Constant-time comparison.
      */
     static verifyWebhookSignature(rawBody, signature, apiSecret) {
+        if (typeof rawBody !== 'string' && !Buffer.isBuffer(rawBody)) {
+            throw new TypeError('rawBody must be the raw request body (string or Buffer), not a parsed object');
+        }
         if (!signature || !apiSecret) {
             return false;
         }

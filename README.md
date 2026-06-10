@@ -212,7 +212,8 @@ The client supports various configuration options:
 - **Rotate any key that may have been exposed** (pasted in a chat, a log, a screenshot), even test keys.
 - **Always verify webhook signatures** with the provided constant-time helpers, and verify against the **raw request body** — re-serializing parsed JSON can change the bytes and break verification.
 - Path parameters are URL-encoded by the clients so untrusted ids cannot alter the request path.
-- Log files (`*.log`) are gitignored; they can contain request payloads.
+- Log files (`*.log`) are gitignored; they can contain request payloads. Credential headers are redacted before logging, and signature debug logging requires an explicit `EBIORO_SIGNATURE_DEBUG=true`.
+- **The web interface is for local testing only.** It binds to `127.0.0.1` by default — do not expose it to a network: it holds your API credentials in its session while you test.
 
 ## 🎯 Production Considerations
 

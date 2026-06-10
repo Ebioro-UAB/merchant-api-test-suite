@@ -120,47 +120,134 @@ class EbioroApiClient {
     }
     
     /**
+     * URL-encode a path parameter so untrusted ids cannot alter the request path.
+     */
+    static pathParam(value) {
+        return encodeURIComponent(String(value));
+    }
+
+    /**
      * Create a payment
      */
     async createPayment(paymentData) {
         return this.makeRequest('POST', '/payments', paymentData);
     }
-    
+
+    /**
+     * Create a shareable payment link.
+     *
+     * A payment link is a payment with a longer expiry window. Omit redirectUrl
+     * for the Ebioro-hosted confirmation screen. The response contains shortUrl —
+     * the link to share with the payer.
+     */
+    async createPaymentLink(paymentData, expiresInHours = 168) {
+        return this.makeRequest('POST', '/payments', { expiresInHours, ...paymentData });
+    }
+
     /**
      * Get a specific payment
      */
     async getPayment(paymentId) {
-        return this.makeRequest('GET', `/payments/${paymentId}`);
+        return this.makeRequest('GET', `/payments/${EbioroApiClient.pathParam(paymentId)}`);
     }
-    
+
     /**
      * Get all payments
      */
     async getAllPayments() {
         return this.makeRequest('GET', '/payments');
     }
-    
+
     /**
      * Create a refund
      */
     async createRefund(paymentId, refundData) {
-        return this.makeRequest('POST', `/payments/${paymentId}/refunds`, refundData);
+        return this.makeRequest('POST', `/payments/${EbioroApiClient.pathParam(paymentId)}/refunds`, refundData);
     }
-    
+
     /**
      * Get all refunds
      */
     async getAllRefunds() {
         return this.makeRequest('GET', '/refunds');
     }
-    
+
     /**
      * Get account balances
      */
     async getAccountBalances() {
         return this.makeRequest('GET', '/accounts/balances');
     }
-    
+
+    /**
+     * Create an invoice (line items + optional single tax percentage).
+     *
+     * The response includes payment_id — fetch that payment via getPayment()
+     * to obtain the shareable payment link (shortUrl) for the customer.
+     */
+    async createInvoice(invoiceData) {
+        return this.makeRequest('POST', '/invoices', invoiceData);
+    }
+
+    /**
+     * List invoices (paginated). The query string is part of the signed path.
+     */
+    async getInvoices(page = 1, limit = 20) {
+        const query = new URLSearchParams({ page: String(page), limit: String(limit) }).toString();
+        return this.makeRequest('GET', `/invoices?${query}`);
+    }
+
+    /**
+     * Get a specific invoice
+     */
+    async getInvoice(invoiceId) {
+        return this.makeRequest('GET', `/invoices/${EbioroApiClient.pathParam(invoiceId)}`);
+    }
+
+    /**
+     * Cancel (void) an unpaid invoice and expire its payment link
+     */
+    async cancelInvoice(invoiceId) {
+        return this.makeRequest('POST', `/invoices/${EbioroApiClient.pathParam(invoiceId)}/cancel`);
+    }
+
+    /**
+     * Get invoice numbering settings (prefix + next number)
+     */
+    async getInvoiceSettings() {
+        return this.makeRequest('GET', '/invoices/settings');
+    }
+
+    /**
+     * Update invoice numbering settings (invoice_prefix and/or next_number)
+     */
+    async updateInvoiceSettings(settings) {
+        return this.makeRequest('POST', '/invoices/settings', settings);
+    }
+
+    /**
+     * Verify the X-WEBHOOK-AUTH signature of an incoming webhook.
+     *
+     * Always verify before processing a webhook. Pass the RAW request body
+     * (string or Buffer) exactly as received — re-serializing the parsed JSON
+     * can change the bytes and break verification. Constant-time comparison.
+     */
+    static verifyWebhookSignature(rawBody, signature, apiSecret) {
+        if (!signature || !apiSecret) {
+            return false;
+        }
+        const expected = crypto
+            .createHmac('sha256', apiSecret)
+            .update(rawBody)
+            .digest('hex');
+        const expectedBuf = Buffer.from(expected, 'utf8');
+        const signatureBuf = Buffer.from(String(signature), 'utf8');
+        if (expectedBuf.length !== signatureBuf.length) {
+            return false;
+        }
+        return crypto.timingSafeEqual(expectedBuf, signatureBuf);
+    }
+
     /**
      * Test authentication
      */

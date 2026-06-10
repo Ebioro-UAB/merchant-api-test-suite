@@ -4,6 +4,7 @@ import hmac
 import hashlib
 import requests
 from typing import Dict, Any, Optional, Tuple
+from urllib.parse import quote, urlencode
 from logger_config import logger
 from utils import ValidationError, SignatureValidator, ResponseValidator, format_json_response, calculate_elapsed_time
 
@@ -144,45 +145,123 @@ class EbioroApiClient:
             
             return 0, error_data, elapsed_time
     
+    @staticmethod
+    def _path_param(value: str) -> str:
+        """URL-encode a path parameter so untrusted ids cannot alter the request path."""
+        return quote(str(value), safe='')
+
     def create_payment(self, payment_data: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
         """Create a new payment"""
         logger.logger.info("💳 Creating payment")
         return self._make_request("POST", "/payments", payment_data)
-    
+
+    def create_payment_link(self, payment_data: Dict[str, Any], expires_in_hours: int = 168) -> Tuple[int, Dict[str, Any], float]:
+        """
+        Create a shareable payment link.
+
+        A payment link is a payment with a longer expiry window. Omit redirectUrl
+        for the Ebioro-hosted confirmation screen. The response contains shortUrl —
+        the link to share with the payer.
+        """
+        logger.logger.info("🔗 Creating payment link")
+        data = dict(payment_data)
+        data.setdefault("expiresInHours", expires_in_hours)
+        return self._make_request("POST", "/payments", data)
+
     def get_payment(self, payment_id: str) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve a specific payment"""
         logger.logger.info(f"🔍 Retrieving payment {payment_id}")
-        return self._make_request("GET", f"/payments/{payment_id}")
-    
+        return self._make_request("GET", f"/payments/{self._path_param(payment_id)}")
+
     def get_all_payments(self) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve all payments"""
         logger.logger.info("📋 Retrieving all payments")
         return self._make_request("GET", "/payments")
-    
+
     def create_refund(self, payment_id: str, refund_data: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
         """Create a refund for a payment"""
         logger.logger.info(f"💸 Creating refund for payment {payment_id}")
-        return self._make_request("POST", f"/payments/{payment_id}/refunds", refund_data)
-    
+        return self._make_request("POST", f"/payments/{self._path_param(payment_id)}/refunds", refund_data)
+
     def get_refunds(self) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve all refunds"""
         logger.logger.info("📋 Retrieving all refunds")
         return self._make_request("GET", "/refunds")
-    
+
     def get_refund(self, refund_id: str) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve a specific refund"""
         logger.logger.info(f"🔍 Retrieving refund {refund_id}")
-        return self._make_request("GET", f"/refunds/{refund_id}")
-    
+        return self._make_request("GET", f"/refunds/{self._path_param(refund_id)}")
+
     def get_account_balances(self) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve all account balances"""
         logger.logger.info("💰 Retrieving account balances")
         return self._make_request("GET", "/accounts/balances")
-    
+
     def get_asset_balance(self, asset: str) -> Tuple[int, Dict[str, Any], float]:
         """Retrieve specific asset balance"""
         logger.logger.info(f"💰 Retrieving {asset} balance")
-        return self._make_request("GET", f"/accounts/balances/{asset}")
+        return self._make_request("GET", f"/accounts/balances/{self._path_param(asset)}")
+
+    # ------------------------------------------------------------------
+    # Invoices
+    # ------------------------------------------------------------------
+
+    def create_invoice(self, invoice_data: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
+        """
+        Create an invoice (line items + optional single tax percentage).
+
+        The response includes payment_id — fetch that payment via get_payment()
+        to obtain the shareable payment link (shortUrl) for the customer.
+        """
+        logger.logger.info("🧾 Creating invoice")
+        return self._make_request("POST", "/invoices", invoice_data)
+
+    def get_invoices(self, page: int = 1, limit: int = 20) -> Tuple[int, Dict[str, Any], float]:
+        """List invoices (paginated). The query string is part of the signed path."""
+        logger.logger.info("📋 Retrieving invoices")
+        query = urlencode({"page": int(page), "limit": int(limit)})
+        return self._make_request("GET", f"/invoices?{query}")
+
+    def get_invoice(self, invoice_id: str) -> Tuple[int, Dict[str, Any], float]:
+        """Retrieve a specific invoice"""
+        logger.logger.info(f"🔍 Retrieving invoice {invoice_id}")
+        return self._make_request("GET", f"/invoices/{self._path_param(invoice_id)}")
+
+    def cancel_invoice(self, invoice_id: str) -> Tuple[int, Dict[str, Any], float]:
+        """Cancel (void) an unpaid invoice and expire its payment link"""
+        logger.logger.info(f"🚫 Cancelling invoice {invoice_id}")
+        return self._make_request("POST", f"/invoices/{self._path_param(invoice_id)}/cancel")
+
+    def get_invoice_settings(self) -> Tuple[int, Dict[str, Any], float]:
+        """Get invoice numbering settings (prefix + next number)"""
+        logger.logger.info("⚙️ Retrieving invoice settings")
+        return self._make_request("GET", "/invoices/settings")
+
+    def update_invoice_settings(self, settings: Dict[str, Any]) -> Tuple[int, Dict[str, Any], float]:
+        """Update invoice numbering settings (invoice_prefix and/or next_number)"""
+        logger.logger.info("⚙️ Updating invoice settings")
+        return self._make_request("POST", "/invoices/settings", settings)
+
+    # ------------------------------------------------------------------
+    # Webhooks
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def verify_webhook_signature(raw_body: bytes, signature: str, api_secret: str) -> bool:
+        """
+        Verify the X-WEBHOOK-AUTH signature of an incoming webhook.
+
+        Always verify before processing a webhook. Pass the RAW request body
+        bytes exactly as received — re-serializing the parsed JSON can change
+        the bytes and break verification. Uses a constant-time comparison.
+        """
+        if not signature or not api_secret:
+            return False
+        if isinstance(raw_body, str):
+            raw_body = raw_body.encode("utf-8")
+        expected = hmac.new(api_secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, signature)
     
     def test_authentication(self) -> Dict[str, Any]:
         """Test authentication by making a simple request"""

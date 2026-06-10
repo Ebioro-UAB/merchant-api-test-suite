@@ -1,8 +1,11 @@
 # Ebioro Merchant API Test Suite
 
-A comprehensive **multi-language** testing suite for the Ebioro Merchant API with HMAC-SHA256 authentication. This project provides **production-ready API client implementations** in **Python, Java, PHP, Node.js, and C#**, along with both web interface and programmatic clients for testing payment operations across different programming languages.
+A testing suite and reference client library for the Ebioro Merchant API with HMAC-SHA256 authentication.
 
-> **🎯 Ready for Production**: All client implementations have been tested in native environments with real API credentials and successful payment creation.
+- **Maintained clients (full API surface, tested live):** **Python** and **Node.js**
+- **Authentication references (HMAC signing example only):** Java, PHP, C#
+
+> **Last verified: 2026-06-10** — Python and Node.js clients tested live against the Ebioro test environment: payments, payment links, invoices, refunds, balances, webhook signature verification.
 
 ## 🚀 Quick Start
 
@@ -49,11 +52,13 @@ This test suite includes complete API client implementations in multiple program
 
 | Language | File | Status | Description |
 |----------|------|--------|-------------|
-| **Python** |  `clients/python/ebioro_client.py` | ✅ Active | Primary implementation with full test suite |
-| **Java** | `clients/java/EbioroApiClient.java` | 🔶 Ready | HttpClient-based implementation |
-| **PHP** | `clients/php/EbioroApiClient.php` | 🔶 Ready | cURL-based implementation |
-| **Node.js** | `clients/nodejs/ebioro-client.js` | 🔶 Ready | Native HTTPS implementation |
-| **C#** | `clients/csharp/EbioroApiClient.cs` | 🔶 Ready | HttpClient async implementation |
+| **Python** | `clients/python/ebioro_client.py` | ✅ Maintained | Full API surface, tested live |
+| **Node.js** | `clients/nodejs/ebioro-client.js` | ✅ Maintained | Full API surface, tested live |
+| **Java** | `clients/java/EbioroApiClient.java` | 📘 Auth reference | Shows HMAC signing; core payment ops only |
+| **PHP** | `clients/php/EbioroApiClient.php` | 📘 Auth reference | Shows HMAC signing; core payment ops only |
+| **C#** | `clients/csharp/EbioroApiClient.cs` | 📘 Auth reference | Shows HMAC signing; core payment ops only |
+
+The auth-reference clients demonstrate the request-signing scheme — the genuinely tricky part of integrating — and core payment operations. New API features (payment links, invoices) are added to the maintained clients only.
 
 ### Using Different Languages
 
@@ -125,8 +130,19 @@ This client correctly implements HMAC-SHA256 authentication as required by the E
 
 ### Payments
 - `create_payment(payment_data)` - Create a new payment
+- `create_payment_link(payment_data, expires_in_hours=168)` - Create a shareable payment link (response includes `shortUrl`)
 - `get_payment(payment_id)` - Retrieve payment details
 - `get_all_payments()` - List all payments
+
+### Invoices
+- `create_invoice(invoice_data)` - Create an invoice (line items + optional single tax percentage)
+- `get_invoices(page, limit)` - List invoices
+- `get_invoice(invoice_id)` - Retrieve an invoice
+- `cancel_invoice(invoice_id)` - Cancel (void) an unpaid invoice
+- `get_invoice_settings()` / `update_invoice_settings(settings)` - Invoice numbering settings
+
+### Webhooks
+- `verify_webhook_signature(raw_body, signature, api_secret)` - Verify the `X-WEBHOOK-AUTH` header (constant-time; pass the raw request body)
 
 ### Account Management
 - `get_account_balances()` - Get current account balances
@@ -188,6 +204,15 @@ The client supports various configuration options:
 - **Debug Information**: View request/response details for troubleshooting
 - **Export Results**: Download test results as JSON
 - **Professional UI**: Clean, modern interface using Bootstrap
+
+## 🔒 Security
+
+- **Never hardcode credentials.** Every script in this repo reads `EBIORO_API_KEY` / `EBIORO_API_SECRET` from the environment. Keep it that way — this is a public repository.
+- **Never commit a `.env` file.** `.gitignore` covers it, but verify before pushing.
+- **Rotate any key that may have been exposed** (pasted in a chat, a log, a screenshot), even test keys.
+- **Always verify webhook signatures** with the provided constant-time helpers, and verify against the **raw request body** — re-serializing parsed JSON can change the bytes and break verification.
+- Path parameters are URL-encoded by the clients so untrusted ids cannot alter the request path.
+- Log files (`*.log`) are gitignored; they can contain request payloads.
 
 ## 🎯 Production Considerations
 

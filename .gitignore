@@ -84,3 +84,7 @@ corrected_documentation_code.py
 clients/csharp/**/obj/
 clients/csharp/**/bin/
 .venv/
+
+# Claude Code / MCP local state — never commit
+.claude/
+.mcp.json
